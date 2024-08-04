@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Session, User } from "@supabase/supabase-js";
 import { useRouter, useSegments, SplashScreen } from "expo-router";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -13,6 +14,8 @@ type SupabaseContextProps = {
 	signUp: (email: string, password: string) => Promise<void>;
 	signInWithPassword: (email: string, password: string) => Promise<void>;
 	signOut: () => Promise<void>;
+	signInWithOTP: (phone: string) => Promise<void>;
+	verifyOTP: (phone: string, otp: string) => Promise<void>;
 };
 
 type SupabaseProviderProps = {
@@ -26,6 +29,8 @@ export const SupabaseContext = createContext<SupabaseContextProps>({
 	signUp: async () => {},
 	signInWithPassword: async () => {},
 	signOut: async () => {},
+	signInWithOTP: async () => {},
+	verifyOTP: async () => {},
 });
 
 export const useSupabase = () => useContext(SupabaseContext);
@@ -52,6 +57,27 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 			email,
 			password,
 		});
+		if (error) {
+			throw error;
+		}
+	};
+
+	const signInWithOTP = async (phone: string) => {
+		const { error } = await supabase.auth.signInWithOtp({
+			phone,
+		});
+		if (error) {
+			throw error;
+		}
+	};
+
+	const verifyOTP = async (phone: string, otp: string) => {
+		const { error, data } = await supabase.auth.verifyOtp({
+			phone,
+			token: otp,
+			type: "sms",
+		});
+		console.log({ error, phone, otp, data });
 		if (error) {
 			throw error;
 		}
@@ -105,6 +131,8 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 				signUp,
 				signInWithPassword,
 				signOut,
+				signInWithOTP,
+				verifyOTP,
 			}}
 		>
 			{children}
