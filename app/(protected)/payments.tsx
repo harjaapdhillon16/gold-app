@@ -1,5 +1,10 @@
-import React, { useEffect } from "react";
-import { View, StyleSheet, ScrollView, KeyboardAvoidingView } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+	View,
+	StyleSheet,
+	ScrollView,
+	KeyboardAvoidingView,
+} from "react-native";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -32,6 +37,7 @@ export default function PaymentsScreen() {
 		setValue,
 	} = form;
 	const { user } = useSupabase(); // Assuming you have supabase context
+	const [isComingSoon, setIsComingSoon] = useState(false); // Add a state variable
 
 	useEffect(() => {
 		if (user?.phone) {
@@ -51,90 +57,111 @@ export default function PaymentsScreen() {
 	return (
 		<SafeAreaView className="flex-1 px-4 bg-background">
 			<ScrollView contentContainerStyle={{ paddingBottom: 400 }}>
-				<Form {...form} onSubmit={handleSubmit(onSubmit)}>
-					<GoldSchemeDetails />
-					<FormField
-						control={control}
-						name="name"
-						render={({ field }) => (
-							<FormInput
-								label="Name"
-								placeholder="Enter your name"
-								autoCapitalize="words"
-								error={errors?.name?.message}
-								{...field}
-								className="mb-4"
-							/>
-						)}
-					/>
+				{isComingSoon ? (
+					<View style={styles.comingSoonContainer}>
+						<Text style={styles.comingSoonText}>Payment Form Coming Soon</Text>
+					</View>
+				) : (
+					<Form {...form} onSubmit={handleSubmit(onSubmit)}>
+						<GoldSchemeDetails />
+						<FormField
+							control={control}
+							name="name"
+							render={({ field }) => (
+								<FormInput
+									label="Name"
+									placeholder="Enter your name"
+									autoCapitalize="words"
+									error={errors?.name?.message}
+									{...field}
+									className="mb-4"
+								/>
+							)}
+						/>
 
-					<FormField
-						control={control}
-						name="email"
-						render={({ field }) => (
-							<FormInput
-								label="Email"
-								placeholder="Enter your email"
-								autoCapitalize="none"
-								error={errors?.email?.message}
-								{...field}
-								className="mb-4"
-							/>
-						)}
-					/>
+						<FormField
+							control={control}
+							name="email"
+							render={({ field }) => (
+								<FormInput
+									label="Email"
+									placeholder="Enter your email"
+									autoCapitalize="none"
+									error={errors?.email?.message}
+									{...field}
+									className="mb-4"
+								/>
+							)}
+						/>
 
-					<FormField
-						control={control}
-						name="phone"
-						render={({ field }) => (
-							<FormInput
-								label="Phone Number"
-								placeholder="Enter your phone number"
-								keyboardType="phone-pad"
-								{...field}
-								className="mb-4"
-							/>
-						)}
-					/>
+						<FormField
+							control={control}
+							name="phone"
+							render={({ field }) => (
+								<FormInput
+									label="Phone Number"
+									placeholder="Enter your phone number"
+									keyboardType="phone-pad"
+									{...field}
+									className="mb-4"
+								/>
+							)}
+						/>
 
-					<FormField
-						control={control}
-						name="address"
-						render={({ field }) => (
-							<FormInput
-								label="Address"
-								placeholder="Enter your address"
-								autoCapitalize="words"
-								{...field}
-								className="mb-4"
-							/>
-						)}
-					/>
+						<FormField
+							control={control}
+							name="address"
+							render={({ field }) => (
+								<FormInput
+									label="Address"
+									placeholder="Enter your address"
+									autoCapitalize="words"
+									{...field}
+									className="mb-4"
+								/>
+							)}
+						/>
 
-					<FormField
-						control={control}
-						name="amount"
-						render={({ field }) => (
-							<FormInput
-								label="Amount"
-								placeholder="Enter the amount"
-								keyboardType="numeric"
-								{...field}
-								className="mb-4"
-							/>
-						)}
-					/>
+						<FormField
+							control={control}
+							name="amount"
+							render={({ field }) => (
+								<FormInput
+									label="Amount"
+									placeholder="Enter the amount"
+									keyboardType="numeric"
+									{...field}
+									className="mb-4"
+								/>
+							)}
+						/>
 
-					<Button size="default" variant="default" onPress={handleSubmit(onSubmit)}>
-						<Text>Submit</Text>
-					</Button>
-				</Form>
+						<Button
+							size="default"
+							variant="default"
+							onPress={handleSubmit(onSubmit)}
+						>
+							<Text>Submit</Text>
+						</Button>
+					</Form>
+				)}
 			</ScrollView>
 		</SafeAreaView>
 	);
 }
 
 const styles = StyleSheet.create({
+	comingSoonContainer: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		padding: 20,
+	},
+	comingSoonText: {
+		fontSize: 24,
+		fontWeight: "bold",
+		paddingTop: 10,
+	},
 	form: {
 		paddingHorizontal: 20,
 		paddingVertical: 30,

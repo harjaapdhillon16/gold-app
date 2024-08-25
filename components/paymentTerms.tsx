@@ -6,9 +6,10 @@ import {
 	Modal,
 	ScrollView,
 } from "react-native";
-import { Text } from "@/components/ui/text";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+
 import { Button } from "@/components/ui/button";
+import { Text } from "@/components/ui/text";
 
 export function GoldSchemeDetails() {
 	const { top } = useSafeAreaInsets();
@@ -43,23 +44,25 @@ export function GoldSchemeDetails() {
 			</View>
 			<Modal
 				animationType="slide"
-				transparent={true}
+				transparent
 				visible={modalVisible}
 				onRequestClose={() => setModalVisible(false)}
 			>
 				<View style={styles.modalOverlay}>
-					<View style={styles.modalContent}>
-						<ScrollView contentContainerStyle={styles.modalScrollView}>
-							{points.map((point, index) => (
-								<View key={index} style={styles.modalPointContainer}>
-									<Text style={styles.modalPointText}>{point}</Text>
-								</View>
-							))}
-							<Button onPress={() => setModalVisible(false)}>
-								<Text>Close</Text>
-							</Button>
-						</ScrollView>
-					</View>
+					<ScrollView contentContainerStyle={{ height: 1000 }}>
+						<View style={styles.modalContent}>
+							<ScrollView contentContainerStyle={styles.modalScrollView}>
+								{points.map((point, index) => (
+									<View key={index} style={styles.modalPointContainer}>
+										<Text style={styles.modalPointText}>{point}</Text>
+									</View>
+								))}
+								<Button onPress={() => setModalVisible(false)}>
+									<Text>Close</Text>
+								</Button>
+							</ScrollView>
+						</View>
+					</ScrollView>
 				</View>
 			</Modal>
 		</View>
@@ -69,7 +72,6 @@ export function GoldSchemeDetails() {
 const styles = StyleSheet.create({
 	container: {
 		flex: 1,
-		backgroundColor: "#fff",
 	},
 	mainContainer: {},
 	header: {
@@ -105,14 +107,14 @@ const styles = StyleSheet.create({
 		flex: 1,
 		justifyContent: "center",
 		alignItems: "center",
-		backgroundColor: "rgba(0, 0, 0, 0.5)",
+		backgroundColor: "black",
 	},
 	modalContent: {
 		width: "100%",
 		height: "90%",
-		backgroundColor: "white",
 		borderRadius: 10,
 		padding: 20,
+		paddingBottom: 100,
 		alignItems: "center",
 	},
 	modalScrollView: {

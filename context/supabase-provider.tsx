@@ -63,8 +63,12 @@ export const SupabaseProvider = ({ children }: SupabaseProviderProps) => {
 	};
 
 	const signInWithOTP = async (phone: string) => {
+		console.log({ phone });
 		const { error } = await supabase.auth.signInWithOtp({
-			phone,
+			phone: phone,
+			options: {
+				channel: "sms",
+			},
 		});
 		if (error) {
 			throw error;

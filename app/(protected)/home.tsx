@@ -9,6 +9,7 @@ import {
 	TouchableOpacity,
 	Modal,
 	Dimensions,
+	TextInput,
 } from "react-native";
 import axios from "axios";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -16,20 +17,30 @@ import { supabase } from "../../config/supabase";
 
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
-import { H1, Muted } from "@/components/ui/typography";
+import { useColorScheme } from "@/lib/useColorScheme";
+import { useSupabase } from "@/context/supabase-provider";
 
 export default function TabOneScreen() {
 	const router = useRouter();
+	const { isDarkColorScheme } = useColorScheme();
 	const [goldPrice, setGoldPrice] = useState(null);
 	const [selectedCategory, setSelectedCategory] = useState(null);
 	const [products, setProducts] = useState([]);
 	const [categories, setCategories] = useState([]);
 	const { top } = useSafeAreaInsets();
 
+	const [userStatus, setUserStatus] = useState(null); // User's request status
+	const [formVisible, setFormVisible] = useState(false);
+	const [formData, setFormData] = useState({
+		name: "",
+		address: "",
+		phone: "",
+	});
+
 	// State for modal visibility and selected product
 	const [modalVisible, setModalVisible] = useState(false);
 	const [selectedProduct, setSelectedProduct] = useState(null);
-
+	const { user, signOut } = useSupabase();
 	useEffect(() => {
 		async function fetchGoldPrice() {
 			try {
@@ -53,37 +64,62 @@ export default function TabOneScreen() {
 	}, []);
 
 	useEffect(() => {
-		async function fetchCategoriesAndProducts() {
-			const { data: variantsData, error: variantsError } = await supabase
-				.from("categories")
-				.select("id, name");
+		async function checkUserStatus() {
+			const { data: userData, error: userError } = await supabase
+				.from("allow_users")
+				.select("status")
+				.eq("user_phone", user?.phone)
+				.single();
 
-			if (variantsError) {
-				console.error("Error fetching variants:", variantsError);
+			if (userError) {
+				console.error("Error checking user status:", userError);
+				setFormVisible(true);
 				return;
 			}
 
-			setCategories(variantsData);
-			setSelectedCategory(variantsData[0]?.name);
-
-			const { data: productsData, error: productsError } = await supabase
-				.from("products")
-				.select("*");
-
-			if (productsError) {
-				console.error("Error fetching products:", productsError);
-				return;
+			if (userData) {
+				setUserStatus(userData.status);
+				if (userData.status === "accepted") {
+					fetchCategoriesAndProducts();
+				}
+			} else {
+				setFormVisible(true);
 			}
-
-			const mappedProducts = productsData.map((product) => {
-				return { ...product };
-			});
-
-			setProducts(mappedProducts);
 		}
 
-		fetchCategoriesAndProducts();
-	}, []);
+		if (user?.phone) {
+			checkUserStatus();
+		}
+	}, [user?.phone]);
+
+	async function fetchCategoriesAndProducts() {
+		const { data: categoriesData, error: categoriesError } = await supabase
+			.from("categories")
+			.select("id, name");
+
+		if (categoriesError) {
+			console.error("Error fetching categories:", categoriesError);
+			return;
+		}
+
+		setCategories(categoriesData);
+		setSelectedCategory(categoriesData[0]?.name);
+
+		const { data: productsData, error: productsError } = await supabase
+			.from("products")
+			.select("*");
+
+		if (productsError) {
+			console.error("Error fetching products:", productsError);
+			return;
+		}
+
+		const mappedProducts = productsData.map((product) => {
+			return { ...product };
+		});
+
+		setProducts(mappedProducts);
+	}
 
 	const handleCategoryPress = (category) => {
 		setSelectedCategory(category);
@@ -94,114 +130,183 @@ export default function TabOneScreen() {
 		setModalVisible(true);
 	};
 
-	console.log({ products, selectedCategory });
+	const handleFormSubmit = async () => {
+		try {
+			const { data, error } = await supabase.from("allow_users").insert({
+				user_data: formData,
+				user_phone: user?.phone,
+				status: "pending",
+				user_id: user?.id,
+			});
+
+			if (error) {
+				console.error("Error submitting request:", error, {
+					user_data: formData,
+					user_phone: user?.phone,
+					status: "pending",
+					user_id: user?.id,
+				});
+			} else {
+				setFormVisible(false);
+				setUserStatus("pending");
+			}
+		} catch (error) {
+			console.error("Error submitting form:", error);
+		}
+	};
 
 	return (
 		<View style={{ paddingTop: top }} className="flex-1 bg-background">
 			<View className="items-center justify-center gap-y-4 border-b-[#e6c300] p-3 border-b">
-				{goldPrice ? (
-					<Text
-						style={{ color: "#e6c300" }}
-						className="text-center text-2xl font-bold"
-					>
-						Gold Price 22 Carat: ₹{goldPrice}
-					</Text>
-				) : (
-					<Text className="text-center">Fetching gold price...</Text>
-				)}
+				<Text
+					style={{ color: "#e6c300" }}
+					className="text-center text-2xl font-bold"
+				>
+					Gold Price 22 Carat: ₹690000
+				</Text>
 			</View>
-			<ScrollView
-				horizontal
-				showsHorizontalScrollIndicator={false}
-				style={styles.categoryScroll}
-			>
-				{categories.map((category, index) => (
-					<TouchableOpacity
-						key={index}
-						style={[
-							styles.categoryCapsule,
-							selectedCategory === category.name &&
-								styles.selectedCategoryCapsule,
-						]}
-						onPress={() => handleCategoryPress(category.name)}
-					>
-						<Text
-							style={[
-								styles.categoryText,
-								selectedCategory === category.name &&
-									styles.selectedCategoryText,
-							]}
-						>
-							{category.name}
-						</Text>
-					</TouchableOpacity>
-				))}
-			</ScrollView>
-			<FlatList
-				data={products.filter(
-					(product) => product.variant === selectedCategory,
-				)}
-				keyExtractor={(item) => item.id.toString()}
-				numColumns={2}
-				renderItem={({ item }) => (
-					<TouchableOpacity
-						style={styles.gridItem}
-						onPress={() => handleProductPress(item)}
-					>
-						<Image
-							source={{ uri: item.image_urls?.[0] }}
-							style={styles.image}
-						/>
-						<Text style={styles.title}>{item.name}</Text>
-					</TouchableOpacity>
-				)}
-				contentContainerStyle={styles.gridContainer}
-			/>
-
-			<Modal
-				animationType="slide"
-				transparent={true}
-				visible={modalVisible}
-				onRequestClose={() => {
-					setModalVisible(!modalVisible);
-				}}
-			>
-				<View style={styles.modalOverlay}>
-					<View style={styles.modalContent}>
-						{selectedProduct && (
-							<>
-								<Image
-									source={{ uri: selectedProduct.image_urls?.[0] }}
-									style={styles.modalImage}
-								/>
-								<Text style={styles.modalTitle}>{selectedProduct.name}</Text>
-								<Text
-									style={{
-										...styles.modalTitle,
-										fontWeight: "normal",
-										marginTop: -10,
-									}}
-								>
-									{selectedProduct.description}
-								</Text>
-								<Button
-									style={{
-										width: "50%",
-										position: "absolute",
-										left: 10,
-										bottom: 10,
-									}}
-									onPress={() => {
-										setModalVisible(!modalVisible);
-									}}
-								>
-									<Text>Close</Text>
-								</Button>
-							</>
-						)}
-					</View>
+			{formVisible ? (
+				<View style={styles.formContainer}>
+					<Text style={styles.formTitle}>Request Access</Text>
+					<TextInput
+						style={{
+							...styles.input,
+							color: !isDarkColorScheme ? "black" : "white",
+						}}
+						placeholder="Name"
+						placeholderTextColor={!isDarkColorScheme ? "black" : "white"}
+						value={formData.name}
+						onChangeText={(text) => setFormData({ ...formData, name: text })}
+					/>
+					<TextInput
+						style={{
+							...styles.input,
+							color: !isDarkColorScheme ? "black" : "white",
+						}}
+						placeholder="Address"
+						value={formData.address}
+						placeholderTextColor={!isDarkColorScheme ? "black" : "white"}
+						onChangeText={(text) => setFormData({ ...formData, address: text })}
+					/>
+					<TextInput
+						style={{
+							...styles.input,
+							color: !isDarkColorScheme ? "black" : "white",
+						}}
+						placeholder="Phone"
+						keyboardType="numeric"
+						value={formData.phone}
+						placeholderTextColor={!isDarkColorScheme ? "black" : "white"}
+						onChangeText={(text) => setFormData({ ...formData, phone: text })}
+					/>
+					<Button onPress={handleFormSubmit}>
+						<Text>Submit</Text>
+					</Button>
 				</View>
-			</Modal>
+			) : userStatus === "pending" ? (
+				<View style={styles.pendingContainer}>
+					<Text>Your request is pending. Please wait for approval.</Text>
+				</View>
+			) : (
+				<>
+					<ScrollView
+						horizontal
+						showsHorizontalScrollIndicator={false}
+						style={styles.categoryScroll}
+					>
+						{categories.map((category) => (
+							<TouchableOpacity
+								key={category.id}
+								style={[
+									styles.categoryCapsule,
+									selectedCategory === category.name &&
+										styles.selectedCategoryCapsule,
+								]}
+								onPress={() => handleCategoryPress(category.name)}
+							>
+								<Text
+									style={[
+										styles.categoryText,
+										selectedCategory === category.name &&
+											styles.selectedCategoryText,
+									]}
+								>
+									{category.name}
+								</Text>
+							</TouchableOpacity>
+						))}
+					</ScrollView>
+					<FlatList
+						data={products.filter(
+							(product) => product.variant === selectedCategory,
+						)}
+						keyExtractor={(item) => item.id.toString()}
+						numColumns={2}
+						renderItem={({ item }) => (
+							<TouchableOpacity
+								style={styles.gridItem}
+								onPress={() => handleProductPress(item)}
+							>
+								<Image
+									source={{ uri: item.image_urls?.[0] }}
+									style={styles.image}
+								/>
+								<Text style={styles.title}>{item.name}</Text>
+							</TouchableOpacity>
+						)}
+						contentContainerStyle={styles.gridContainer}
+					/>
+
+					<Modal
+						animationType="slide"
+						transparent={true}
+						visible={modalVisible}
+						onRequestClose={() => {
+							setModalVisible(!modalVisible);
+						}}
+					>
+						<View style={styles.modalOverlay}>
+							<ScrollView contentContainerStyle={styles.modalContentContainer}>
+								<View
+									style={{
+										...styles.modalContent,
+										backgroundColor: isDarkColorScheme ? "black" : "white",
+									}}
+								>
+									{selectedProduct && (
+										<>
+											<Image
+												source={{ uri: selectedProduct.image_urls?.[0] }}
+												style={styles.modalImage}
+											/>
+											<Text style={styles.modalTitle}>
+												{selectedProduct.name}
+											</Text>
+											<Text
+												style={{
+													...styles.modalTitle,
+													fontWeight: "normal",
+													marginTop: -10,
+												}}
+											>
+												{selectedProduct.description}
+											</Text>
+											<Button
+												style={styles.closeButton}
+												onPress={() => {
+													setModalVisible(!modalVisible);
+												}}
+											>
+												<Text>Close</Text>
+											</Button>
+										</>
+									)}
+								</View>
+							</ScrollView>
+						</View>
+					</Modal>
+				</>
+			)}
 		</View>
 	);
 }
@@ -253,21 +358,28 @@ const styles = StyleSheet.create({
 	},
 	modalOverlay: {
 		flex: 1,
+		paddingTop: 100,
+		minHeight: Dimensions.get("window").height - 100,
 		justifyContent: "center",
 		alignItems: "center",
 		backgroundColor: "rgba(0, 0, 0, 0.5)",
 	},
+	modalContentContainer: {
+		justifyContent: "center",
+		alignItems: "center",
+		minHeight: Dimensions.get("window").height - 100,
+	},
 	modalContent: {
 		width: Dimensions.get("window").width,
-		height: Dimensions.get("window").height * 0.9,
 		padding: 20,
+		minHeight: Dimensions.get("window").height - 100,
 		backgroundColor: "white",
 		borderRadius: 10,
 		alignItems: "center",
 	},
 	modalImage: {
 		width: "100%",
-		height: "70%",
+		height: 300,
 		borderRadius: 10,
 		marginBottom: 20,
 	},
@@ -278,5 +390,29 @@ const styles = StyleSheet.create({
 		width: "100%",
 		paddingLeft: 5,
 		marginBottom: 20,
+	},
+	closeButton: {
+		width: "50%",
+		bottom: 10,
+	},
+	formContainer: {
+		padding: 20,
+	},
+	formTitle: {
+		fontSize: 24,
+		fontWeight: "bold",
+		marginBottom: 20,
+	},
+	input: {
+		height: 40,
+		borderColor: "gray",
+		borderWidth: 1,
+		marginBottom: 20,
+		paddingHorizontal: 10,
+		borderRadius: 5,
+	},
+	pendingContainer: {
+		padding: 20,
+		alignItems: "center",
 	},
 });

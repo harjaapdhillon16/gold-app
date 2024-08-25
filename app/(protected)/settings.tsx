@@ -42,7 +42,7 @@ export default function TabTwoScreen() {
 			</View>
 			<View className="p-4 rounded-lg shadow-md w-full mt-4">
 				<Text className="text-lg font-bold mb-2">Amount Contributed:</Text>
-				<Text className="text-gray-600">₹ 10,000</Text>
+				<Text className="text-gray-600">₹0</Text>
 			</View>
 			<Button
 				className="w-full mt-4"
