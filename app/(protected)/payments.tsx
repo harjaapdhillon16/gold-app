@@ -64,7 +64,7 @@ export default function PaymentsScreen() {
 				) : (
 					<Form {...form} onSubmit={handleSubmit(onSubmit)}>
 						<GoldSchemeDetails />
-						<FormField
+						{/* <FormField
 							control={control}
 							name="name"
 							render={({ field }) => (
@@ -142,7 +142,7 @@ export default function PaymentsScreen() {
 							onPress={handleSubmit(onSubmit)}
 						>
 							<Text>Submit</Text>
-						</Button>
+						</Button> */}
 					</Form>
 				)}
 			</ScrollView>

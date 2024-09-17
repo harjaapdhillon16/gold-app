@@ -16,7 +16,7 @@ export function GoldSchemeDetails() {
 	const [modalVisible, setModalVisible] = useState(false);
 
 	const points = [
-		"You will need to pay 11 monthly installments, and you can purchase jewelry in the 12th month.",
+		"You will need to pay 11 monthly installments, and you can purchase jewelry in the 12th month. (Coming Soon)",
 		"If the customer discontinues during the 7th or 8th month of enrollment, the member will be entitled to 50% discount on the wastage (VA), and for discontinuation during the 9th or 10th month, the member will be entitled to 70% discount on the wastage (VA), limited to the gold weight applicable for the accumulated value under the plan.",
 		"In case the Customer does not redeem within 1 month from the maturity date, he/she will be provided with a refund or a voucher of the amount aggregating all the installments paid by the Customer until the date of the voucher.",
 		"The final product invoice value should be equal to or in excess of the purchase eligibility amount.",

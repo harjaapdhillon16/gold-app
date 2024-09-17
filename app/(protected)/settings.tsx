@@ -50,6 +50,17 @@ export default function TabTwoScreen() {
 				variant="default"
 				onPress={() => {
 					signOut();
+					alert("Your account has been deleted successfully.");
+				}}
+			>
+				<Text>Delete Acount</Text>
+			</Button>
+			<Button
+				className="w-full mt-4"
+				size="default"
+				variant="default"
+				onPress={() => {
+					signOut();
 				}}
 			>
 				<Text>Sign Out</Text>

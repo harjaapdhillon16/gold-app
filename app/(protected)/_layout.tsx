@@ -29,14 +29,14 @@ export default function ProtectedLayout() {
 					),
 				}}
 			/>
-			<Tabs.Screen
+			{/* <Tabs.Screen
 				name="payments"
 				options={{
 					tabBarIcon: ({ color, size }) => (
 						<FontAwesome5 name="cc-amazon-pay" color={color} size={size} />
 					),
 				}}
-			/>
+			/> */}
 			<Tabs.Screen
 				name="settings"
 				options={{
