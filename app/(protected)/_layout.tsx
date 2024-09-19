@@ -3,7 +3,7 @@ import React from "react";
 import { Text } from "react-native";
 import { theme } from "@/lib/constants";
 import { useColorScheme } from "@/lib/useColorScheme";
-import { Ionicons ,FontAwesome5} from "@expo/vector-icons"; // Import Ionicons from Expo
+import { Ionicons, AntDesign } from "@expo/vector-icons"; // Import Ionicons from Expo
 
 export default function ProtectedLayout() {
 	const { colorScheme } = useColorScheme();
@@ -26,6 +26,14 @@ export default function ProtectedLayout() {
 				options={{
 					tabBarIcon: ({ color, size }) => (
 						<Ionicons name="home" color={color} size={size} />
+					),
+				}}
+			/>
+			<Tabs.Screen
+				name="appointments"
+				options={{
+					tabBarIcon: ({ color, size }) => (
+						<AntDesign name="calendar" color={color} size={size} />
 					),
 				}}
 			/>
