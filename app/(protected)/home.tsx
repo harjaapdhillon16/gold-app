@@ -29,7 +29,7 @@ export default function TabOneScreen() {
 	const [categories, setCategories] = useState([]);
 	const { top } = useSafeAreaInsets();
 
-	const [userStatus, setUserStatus] = useState(null); // User's request status
+	const [userStatus, setUserStatus] = useState("approved"); // User's request status
 	const [formVisible, setFormVisible] = useState(false);
 	const [formData, setFormData] = useState({
 		name: "",
@@ -88,7 +88,9 @@ export default function TabOneScreen() {
 		}
 
 		if (user?.phone) {
-			checkUserStatus();
+			fetchCategoriesAndProducts();
+		} else {
+			fetchCategoriesAndProducts();
 		}
 	}, [user?.phone]);
 
@@ -220,7 +222,7 @@ export default function TabOneScreen() {
 								style={[
 									styles.categoryCapsule,
 									selectedCategory === category.name &&
-										styles.selectedCategoryCapsule,
+									styles.selectedCategoryCapsule,
 								]}
 								onPress={() => handleCategoryPress(category.name)}
 							>
@@ -228,7 +230,7 @@ export default function TabOneScreen() {
 									style={[
 										styles.categoryText,
 										selectedCategory === category.name &&
-											styles.selectedCategoryText,
+										styles.selectedCategoryText,
 									]}
 								>
 									{category.name}

@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { H1, Muted } from "@/components/ui/typography";
 import { useSupabase } from "@/context/supabase-provider";
+import { useRouter } from 'expo-router'
 
 export default function TabTwoScreen() {
 	const { user, signOut } = useSupabase();
 	const [amountContributed, setAmountContributed] = useState(0);
+	const router = useRouter()
 
 	// useEffect(() => {
 	// 	fetchAmountContributed();
@@ -32,6 +34,24 @@ export default function TabTwoScreen() {
 	// 		console.error("Error fetching amount contributed:", error.message);
 	// 	}
 	// };
+
+	if (!user) {
+		return (
+			<View className="flex-1 items-center justify-center bg-background p-4 gap-y-4">
+				<H1 className="text-center">Login To View Account Info</H1>
+				<Button
+					className="w-full mt-4"
+					size="default"
+					variant="default"
+					onPress={() => {
+						router.push("/sign-up")
+					}}
+				>
+					<Text>Sign In</Text>
+				</Button>
+			</View>
+		)
+	}
 
 	return (
 		<View className="flex-1 items-center justify-center bg-background p-4 gap-y-4">

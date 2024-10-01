@@ -15,6 +15,9 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import { supabase } from "../../config/supabase";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSupabase } from "@/context/supabase-provider";
+import { Button } from "@/components/ui/button";
+import { H1 } from "@/components/ui/typography";
+import { useRouter } from "expo-router";
 
 export default function AppointmentScreen({ navigation }: any) {
 	const [appointmentDate, setAppointmentDate] = useState(new Date());
@@ -98,6 +101,8 @@ export default function AppointmentScreen({ navigation }: any) {
 		setShowDatePicker(Platform.OS === "ios");
 		setAppointmentDate(currentDate);
 	};
+	const router = useRouter()
+
 
 	const handleTimeChange = (event, selectedTime) => {
 		const currentTime = selectedTime || appointmentTime;
@@ -120,6 +125,25 @@ export default function AppointmentScreen({ navigation }: any) {
 			</Text>
 		</View>
 	);
+
+	if (!user) {
+		return (
+			<View className="flex-1 items-center justify-center bg-background p-4 gap-y-4">
+				<H1 className="text-center">Login To View Account Info</H1>
+				<Button
+					className="w-full mt-4"
+					size="default"
+					variant="default"
+					onPress={() => {
+						router.push("/sign-up")
+					}}
+				>
+					<Text>Sign In</Text>
+				</Button>
+			</View>
+		)
+	}
+
 
 	return (
 		<View
