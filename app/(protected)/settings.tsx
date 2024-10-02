@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { View } from "react-native";
+import { View, useColorScheme } from "react-native";
 import { Button } from "@/components/ui/button";
 import { Text } from "@/components/ui/text";
 import { H1, Muted } from "@/components/ui/typography";
@@ -35,6 +35,9 @@ export default function TabTwoScreen() {
 	// 	}
 	// };
 
+	const { colorScheme } = useColorScheme();
+	const isDarkMode = colorScheme === "dark";
+
 	if (!user) {
 		return (
 			<View className="flex-1 items-center justify-center bg-background p-4 gap-y-4">
@@ -47,7 +50,14 @@ export default function TabTwoScreen() {
 						router.push("/sign-up")
 					}}
 				>
-					<Text>Sign In</Text>
+					<Text style={!isDarkMode ? {
+						fontSize: 16,
+					} : {
+						fontSize: 16,
+						color: "#fff",
+					}}>
+						Sign In
+					</Text>
 				</Button>
 			</View>
 		)

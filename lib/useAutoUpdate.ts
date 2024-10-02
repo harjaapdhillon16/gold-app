@@ -23,7 +23,7 @@ export const useAutoUpdate = () => {
       } catch (e) {
         Toast.show({
           type: "success",
-          text1: "Welcome to pulsepeak",
+          text1: "Welcome to Lalit Jewellers",
         });
         console.error("Error checking for updates:", e);
       }

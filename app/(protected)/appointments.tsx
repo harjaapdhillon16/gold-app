@@ -138,7 +138,9 @@ export default function AppointmentScreen({ navigation }: any) {
 						router.push("/sign-up")
 					}}
 				>
-					<Text>Sign In</Text>
+					<Text style={isDarkMode ? styles.text : styles.darkText}>
+						Sign In
+					</Text>
 				</Button>
 			</View>
 		)

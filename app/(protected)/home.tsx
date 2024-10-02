@@ -164,7 +164,7 @@ export default function TabOneScreen() {
 					style={{ color: "#e6c300" }}
 					className="text-center text-2xl font-bold"
 				>
-					Gold Price 22 Carat: ₹690000
+					Gold Price 22 Carat (10gm): ₹71,500
 				</Text>
 			</View>
 			{formVisible ? (
