@@ -3,7 +3,7 @@
     "name": "Lalit Jewelers",
     "slug": "lalit-jewelers",
     "scheme": "lalit-jewelers",
-    "version": "8.0.0",
+    "version": "9.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "automatic",
@@ -16,15 +16,12 @@
       "**/*"
     ],
     "ios": {
-      "buildNumber": "8",
+      "buildNumber": "9",
       "supportsTablet": true,
-      "config": {
-        "usesNonExemptEncryption": false
-      },
       "bundleIdentifier": "com.lalitjewelers.lalitjewelers"
     },
     "android": {
-      "versionCode": 8,
+      "versionCode": 9,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -50,7 +47,7 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/eb10e2cc-76cc-421f-a976-b677cd9d2ff0"
+      "url": "https://u.expo.dev/9c6bdfc5-a830-4d6f-a98f-3072afa57fc9"
     }
   }
 }
